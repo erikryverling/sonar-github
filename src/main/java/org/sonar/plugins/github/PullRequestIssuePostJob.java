@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.kohsuke.github.GHCommitState;
 import org.sonar.api.batch.CheckProject;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
@@ -68,9 +69,7 @@ public class PullRequestIssuePostJob implements org.sonar.api.batch.PostJob, Che
 
     pullRequestFacade.deleteOutdatedComments();
 
-    pullRequestFacade.createOrUpdateGlobalComments(report.hasNewIssue() ? report.formatForMarkdown() : null);
-
-    pullRequestFacade.createOrUpdateSonarQubeStatus(report.getStatus(), report.getStatusDescription());
+    pullRequestFacade.createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube analysis completed successfully");
   }
 
   @Override

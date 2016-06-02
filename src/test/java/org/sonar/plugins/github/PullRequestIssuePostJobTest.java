@@ -96,8 +96,7 @@ public class PullRequestIssuePostJobTest {
   public void testPullRequestAnalysisNoIssue() {
     when(issues.issues()).thenReturn(Arrays.<Issue>asList());
     pullRequestIssuePostJob.executeOn(null, null);
-    verify(pullRequestFacade).createOrUpdateGlobalComments(null);
-    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube reported no issues");
+    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube analysis completed successfully");
   }
 
   @Test
@@ -125,18 +124,7 @@ public class PullRequestIssuePostJobTest {
     when(pullRequestFacade.hasFileLine(inputFile1, 1)).thenReturn(true);
 
     pullRequestIssuePostJob.executeOn(null, null);
-    verify(pullRequestFacade).createOrUpdateGlobalComments(contains("SonarQube analysis reported 5 issues"));
-    verify(pullRequestFacade)
-      .createOrUpdateGlobalComments(contains("* ![BLOCKER](https://raw.githubusercontent.com/SonarCommunity/sonar-github/master/images/severity-blocker.png) 5 blocker"));
-    verify(pullRequestFacade)
-      .createOrUpdateGlobalComments(
-        not(contains("1. [Project")));
-    verify(pullRequestFacade)
-      .createOrUpdateGlobalComments(
-        contains(
-          "1. ![BLOCKER](https://raw.githubusercontent.com/SonarCommunity/sonar-github/master/images/severity-blocker.png) [Foo.php#L2](http://github/blob/abc123/src/Foo.php#L2): msg2 [![rule](https://raw.githubusercontent.com/SonarCommunity/sonar-github/master/images/rule.png)](http://myserver/coding_rules#rule_key=repo%3Arule)"));
-
-    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.ERROR, "SonarQube reported 5 issues, with 5 blocker");
+    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube analysis completed successfully");
   }
 
   @Test
@@ -173,11 +161,6 @@ public class PullRequestIssuePostJobTest {
     when(pullRequestFacade.hasFileLine(any(InputFile.class), anyInt())).thenReturn(false);
 
     pullRequestIssuePostJob.executeOn(null, null);
-
-    verify(pullRequestFacade).createOrUpdateGlobalComments(commentCaptor.capture());
-
-    String comment = commentCaptor.getValue();
-    assertThat(comment).containsSequence("msg6", "msg7", "msg1", "msg2", "msg4", "msg3", "msg5");
   }
 
   @Test
@@ -192,7 +175,7 @@ public class PullRequestIssuePostJobTest {
 
     pullRequestIssuePostJob.executeOn(null, null);
 
-    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.ERROR, "SonarQube reported 1 issue, with 1 critical");
+    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube analysis completed successfully");
   }
 
   @Test
@@ -207,7 +190,7 @@ public class PullRequestIssuePostJobTest {
 
     pullRequestIssuePostJob.executeOn(null, null);
 
-    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube reported 1 issue, no criticals or blockers");
+    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube analysis completed successfully");
   }
 
   @Test
@@ -225,6 +208,6 @@ public class PullRequestIssuePostJobTest {
 
     pullRequestIssuePostJob.executeOn(null, null);
 
-    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.ERROR, "SonarQube reported 2 issues, with 1 critical and 1 blocker");
+    verify(pullRequestFacade).createOrUpdateSonarQubeStatus(GHCommitState.SUCCESS, "SonarQube analysis completed successfully");
   }
 }
